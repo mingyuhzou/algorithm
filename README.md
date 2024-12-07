@@ -14,13 +14,28 @@
 
 
 
+24底
+
+![{8A1ECDE3-C9A4-4130-9BF3-2EFC6698ED7F}](./assets/{8A1ECDE3-C9A4-4130-9BF3-2EFC6698ED7F}.png)
+
 
 
 有空会做牛客和codeforce
+
+
+
+
+
+![{7CF810B8-3436-499E-B333-7DC91F46A075}](./assets/{7CF810B8-3436-499E-B333-7DC91F46A075}.png)
+
+![](./assets/{4F25AB48-7DCF-4502-BC89-E7313D948FDD}.png)
+
+
 
 <img src="img_readme/image-20240521200820760.png" alt="image-20240521200820760" style="zoom:50%;" />
 
 
 
+把我打得道心崩溃
 
-
+![{93EA6E8A-FAF8-4B50-A292-841ABC55134C}](./assets/{93EA6E8A-FAF8-4B50-A292-841ABC55134C}.png)
