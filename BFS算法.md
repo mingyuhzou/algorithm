@@ -1,16 +1,12 @@
----
-
----
-
 # BFS算法
 
 BFS是把一些问题抽象成图，从一个点开始向四周扩散。一般的应用场景是求从起点到终点的最小距离。
 
 
 
-### 二叉树的最小深度
+## 二叉树的最小深度
 
-<img src="./image-20230915170301484-1732418227672-37-1732418422452-1.png" alt="image-20230915170301484" style="zoom:50%;" />
+<img src="./assets/image-20230915170301484.png" alt="image-20230915170301484" style="zoom:50%;" />
 
 ```python
 class Solution(object):
@@ -61,11 +57,11 @@ class Solution(object):
             self.backtrace(root.right,depth+1)
 ```
 
-### 树的直径
+# 树的直径
 
-#### 树的直径
+## 树的直径
 
-<img src="./image-20231025091005294-1732418227673-38-1732418422453-2.png" alt="image-20231025091005294" style="zoom:50%;" />
+<img src="./assets/image-20231025091005294.png" alt="image-20231025091005294" style="zoom:50%;" />
 
 树的直径就是两个相邻最远的节点的距离
 
@@ -121,7 +117,7 @@ class Solution(object):
 
 + 使用回溯算法解题，如果可以得到从父节点到任何后代叶子节点的最长距离t1,t2，那么经过该父节点的最长半径就是t1+t2，整个树的最长半径就是所有节点中的最长半径
 
-![image-20231025125714535](./image-20231025125714535-1732418227673-39-1732418422453-3.png)
+![image-20231025125714535](./assets/image-20231025125714535.png)
 
 ```python
 class Solution(object):
@@ -166,9 +162,9 @@ class Solution(object):
         return self.diameter
 ```
 
-#### N叉树的直径
+## N叉树的直径
 
-![image-20231025131235060](./image-20231025131235060-1732418227673-40-1732418422453-5.png)
+![image-20231025131235060](./assets/image-20231025131235060.png)
 
 与上一题一样
 
@@ -192,9 +188,9 @@ class Solution(object):
         return self.diameter
 ```
 
-#### 串门
+## 串门
 
-![image-20231025150112153](./image-20231025150112153-1732418227673-41-1732418422453-4.png)
+![image-20231025150112153](./assets/image-20231025150112153.png)
 
 这种问题的最短路径就是所有的边之和乘2减去一条树的直径，但是这题每条边是有权重的，计算直径不能按照一般的方法。照样使用bfs模板，不过在遍历中有一个外部变量记录距离。
 
@@ -246,9 +242,9 @@ node2,distance=bfs(node1)
 print(w_sum*2-distance[node2])
 ```
 
-#### [合并两棵树后的最小直径](https://leetcode.cn/problems/find-minimum-diameter-after-merging-two-trees/)
+## [合并两棵树后的最小直径](https://leetcode.cn/problems/find-minimum-diameter-after-merging-two-trees/)
 
-![image-20240630142154207](./image-20240630142154207-1732418193185-1-1732418227675-59-1732418422453-6.png)
+![image-20240630142154207](./assets/image-20240630142154207.png)
 
 两棵树合并后树的直径有两种情况，直径不会改变还是合并前两个树的直径中最大的那个，或者树的直径会经过连接的位置然后加上两个树的剩余直径之和（因为直径是树上最长的边所以一定会经过原本树上的直径），为了保证整个树的直径最小应该选择两个树的直径的中点相连，这里不需要知道那个是中点，因为只需要求出数值大小
 
@@ -288,51 +284,13 @@ class Solution:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 家族树
+## 家族树
 
 一个多叉树的题目 给与我们两个整数NM 整数N表示树中结点总数，整数M表示非叶子结点数。根节点数序号01接下来s行每行输入一个节点和该节点的子节点 格式如下ID K ID[1]ID[2] ... ID [K] 工D表示当前节点K表示该节点的子节点的数目后面一次是子节点的ID以空格间隔 要求我们输出从上往下树的每一层有多少叶子结点以空格间隔。
 
 要求查看每一层的叶子节点数目，使用BFS进行层次遍历的同时用一个外部变量记录当前层次的叶子节点数目。
 
-![image-20231009234915272](./image-20231009234915272-1732418227673-42-1732418422453-7.png)
+![image-20231009234915272](./assets/image-20231009234915272.png)
 
 使用字典来对应多叉树的关系，每个值设置为一个数组，其中装着键所对应的子树。根节点是1，使用BFS广度优先搜索在队列中首先存入的是根节点，然后弹出根节点，根据字典查看它有没有子树，如果没有说明他是一个叶子节点，如果有加入它的子树们，之后一个个弹出当前队列中的子树，判断他们是否有子树，如果没有更新外部变量，如果有加入到末尾，当前队列中每一个子树都遍历完了，将外部变量加入到最终结果中，然后进入下一层。
 
@@ -384,9 +342,9 @@ print(" ".join(map(str,res)))
 
 
 
-### 打开转盘锁
+## 打开转盘锁
 
-![image-20230915180340914](./image-20230915180340914-1732418227673-43-1732418422453-8.png)
+![image-20230915180340914](./assets/image-20230915180340914.png)
 
 如果不考虑死亡号码只看如何得出所有的号码，每次拨动一位，一个号码再拨动后会有八种可能，可以理解为BFS，在BFS的框架上加上细节改动即可。
 
@@ -517,11 +475,11 @@ class Solution(object):
         return -1
 ```
 
-### 八转码
+## 八转码
 
 
 
-![image-20240124231501881](./image-20240124231501881-1732418227673-44-1732418422453-9.png)
+![image-20240124231501881](./assets/image-20240124231501881.png)
 
 
 
@@ -595,17 +553,17 @@ print(bfs())
 
 
 
-### [引爆最多的炸弹](https://leetcode.cn/problems/detonate-the-maximum-bombs/)
+## [引爆最多的炸弹](https://leetcode.cn/problems/detonate-the-maximum-bombs/)
 
 
 
-![image-20231216215740688](./image-20231216215740688-1732418227673-45-1732418422453-11.png)
+![image-20231216215740688](./assets/image-20231216215740688.png)
 
-![image-20231216215751473](./image-20231216215751473-1732418227673-46-1732418422453-10.png)
+![image-20231216215751473](./assets/image-20231216215751473.png)
 
 
 
-![image-20231216215757747](./image-20231216215757747-1732418227673-47-1732418422453-12.png)
+![image-20231216215757747](./assets/image-20231216215757747.png)
 
 
 
@@ -659,9 +617,9 @@ class Solution:
         return ans 
 ```
 
-### [ 逐层排序二叉树所需的最少操作数目](https://leetcode.cn/problems/minimum-number-of-operations-to-sort-a-binary-tree-by-level/)
+## [ 逐层排序二叉树所需的最少操作数目](https://leetcode.cn/problems/minimum-number-of-operations-to-sort-a-binary-tree-by-level/)
 
-![image-20240111153707589](./image-20240111153707589-1732418227673-48-1732418422453-13.png)
+![image-20240111153707589](./assets/image-20240111153707589.png)
 
 问题的关键在于一串数字如何确定通过交换两个数字达到有序的最少次数是多少，`这个问题要用到置换环（技巧点）：比如一串数字1 0 3 4 2，其中后三位和前两位的交换是互不干涉的，可以被分为两个环，而找到环的技巧是以当前值为下标，不断在数组中查找直到，回到原位，这就是一个环，最少的交换次数是环中的数字个数减一（或者是数组中元素的个数减去环的个数）`，而本题中数组并不使从0到n的而是随机开始的，因此需要离散化处理（技巧点），把5 6 7 8 变为0 1 2 3，`最简单的做法是将值排序后用二分搜索`。
 
@@ -704,9 +662,9 @@ class Solution:
 
 
 
-### [推多米诺](https://leetcode.cn/problems/push-dominoes/)
+## [推多米诺](https://leetcode.cn/problems/push-dominoes/)
 
-![image-20240112170342666](./image-20240112170342666-1732418227673-49-1732418422453-14.png)
+![image-20240112170342666](./assets/image-20240112170342666.png)
 
 使用bfs模拟，每个受力的纸牌在下一时间都会影响到它受力方向的那个纸牌，如果一个纸牌在同一时间受到两个同向的力，那么他会保持不懂，使用bfs模拟同一时间每个纸牌的受力。
 
@@ -745,9 +703,9 @@ class Solution:
 
 
 
-### [二叉树中所有距离为 K 的结点](https://leetcode.cn/problems/all-nodes-distance-k-in-binary-tree/)
+## [二叉树中所有距离为 K 的结点](https://leetcode.cn/problems/all-nodes-distance-k-in-binary-tree/)
 
-![image-20240130102050647](./image-20240130102050647-1732418227673-50-1732418422453-15.png)
+![image-20240130102050647](./assets/image-20240130102050647.png)
 
 
 
@@ -796,11 +754,11 @@ class Solution:
 
 ### [颜色交替的最短路径](https://leetcode.cn/problems/shortest-path-with-alternating-colors/)
 
-![image-20240313105753082](./image-20240313105753082-1732418227674-51-1732418422453-16.png)
+![image-20240313105753082](./assets/image-20240313105753082.png)
 
 并给是最短路问题
 
-![image-20240313105824496](./image-20240313105824496-1732418227674-52-1732418422453-17.png)
+![image-20240313105824496](./assets/image-20240313105824496.png)
 
 使用bfs遍历，最短路就是最先遍历到的距离，向外遍历的时候只有颜色不同的才能走到。
 
@@ -847,11 +805,11 @@ class Solution:
 
 
 
-### 母亲的牛奶
+## 母亲的牛奶
 
 
 
-![image-20240318225449649](./image-20240318225449649-1732418227674-53-1732418422453-18.png)
+![image-20240318225449649](./assets/image-20240318225449649.png)
 
 使用bfs模拟从一个桶倒入另一个桶的过程
 
@@ -900,9 +858,9 @@ for i in range(21):
 print(*sorted(ans))
 ```
 
-### [跳跃游戏 IV](https://leetcode.cn/problems/jump-game-iv/)
+## [跳跃游戏 IV](https://leetcode.cn/problems/jump-game-iv/)
 
-![image-20240325115439440](./image-20240325115439440-1732418227674-54-1732418422453-19.png)
+![image-20240325115439440](./assets/image-20240325115439440.png)
 
 使用bfs而不是dfs回溯，可以看作是在图中的一个点到另一个点
 
@@ -941,11 +899,11 @@ class Solution:
             ans+=1
 ```
 
-### [转化数字的最小运算数](https://leetcode.cn/problems/minimum-operations-to-convert-number/)
+## [转化数字的最小运算数](https://leetcode.cn/problems/minimum-operations-to-convert-number/)
 
 
 
-![image-20240405105609186](./image-20240405105609186-1732418227674-55-1732418422453-20.png)
+![image-20240405105609186](./assets/image-20240405105609186.png)
 
 每次有三种可能，使用bfs
 
@@ -976,13 +934,13 @@ class Solution:
 
 
 
-### [图中的最短环](https://leetcode.cn/problems/shortest-cycle-in-a-graph/)
+## [图中的最短环](https://leetcode.cn/problems/shortest-cycle-in-a-graph/)
 
-<img src="./image-20240504153908436-1732418227674-56-1732418422453-21.png" alt="image-20240504153908436" style="zoom:50%;" />
+<img src="./assets/image-20240504153908436.png" alt="image-20240504153908436" style="zoom:50%;" />
 
-<img src="./image-20240504153914762-1732418227674-57-1732418422453-22.png" alt="image-20240504153914762" style="zoom:50%;" />
+<img src="./assets/image-20240504153914762.png" alt="image-20240504153914762" style="zoom:50%;" />
 
-<img src="./1680363054-UnoCDM-b101_t4_cut-1732418227674-58-1732418422453-23.png" alt="b101_t4_cut.png" style="zoom:50%;" />
+<img src="./assets/1680363054-UnoCDM-b101_t4_cut.png" alt="b101_t4_cut.png" style="zoom:50%;" />
 
 枚举每一个起点走bfs，与一般的bfs不同在于这里需要一个记录距离的数组
 
@@ -1016,11 +974,11 @@ class Solution:
 
 ```
 
-### [执行操作后字典序最小的字符串](https://leetcode.cn/problems/lexicographically-smallest-string-after-applying-operations/)
+## [执行操作后字典序最小的字符串](https://leetcode.cn/problems/lexicographically-smallest-string-after-applying-operations/)
 
-![image-20240607210652325](./image-20240607210652325-1732418193186-2-1732418227676-60-1732418422454-26.png)
+![image-20240607210652325](./assets/image-20240607210652325.png)
 
-![image-20240607210702830](./image-20240607210702830-1732418193186-3-1732418227676-61-1732418422453-24.png)
+![image-20240607210702830](./assets/image-20240607210702830.png)
 
 
 
@@ -1054,11 +1012,11 @@ class Solution:
 
 ```
 
-### 走一个大整数迷宫
+## 走一个大整数迷宫
 
-<img src="./image-20240702204854832-1732418193186-5-1732418227676-62-1732418422453-25.png" alt="image-20240702204854832" style="zoom:50%;" />
+<img src="./assets/image-20240702204854832.png" alt="image-20240702204854832" style="zoom:50%;" />
 
-<img src="./image-20240702205008377-1732418193186-4-1732418227677-63-1732418422454-27.png" alt="image-20240702205008377" style="zoom:50%;" />
+<img src="./assets/image-20240702205008377.png" alt="image-20240702205008377" style="zoom:50%;" />
 
 这道题用bfs存在回头的走法为了保证计数器的大小模p-1可以为0，同时对于同一个位置虽然他可以多次访问但是条件是再次访问这个位置时计数器的大小模p-1不会重复，如果重复了那么相当于多走了无用的步数不符合题目要求。
 
@@ -1109,13 +1067,13 @@ res=slove()
 print(res)
 ```
 
-### **Go Stone Puzzle**
+## **Go Stone Puzzle**
 
-![image-20240708223705011](./image-20240708223705011-1732418193186-7-1732418227677-64-1732418422454-28.png)
+![image-20240708223705011](./assets/image-20240708223705011.png)
 
 
 
-![image-20240708223712569](./image-20240708223712569-1732418193186-6-1732418227677-65-1732418422454-29.png)
+![image-20240708223712569](./assets/image-20240708223712569.png)
 
 相当于用bfs求解最短路，将一个状态出发能得到的可能都枚举出来（过程中用集合去重）一步步往后找最终状态。
 
@@ -1170,11 +1128,53 @@ print(-1)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 多源BFS
 
 ## [找出最安全路径](https://leetcode.cn/problems/find-the-safest-path-in-a-grid/)
 
-![{ADF92BAE-1744-4BCE-8D8C-4A34F1345E84}](./assets/{ADF92BAE-1744-4BCE-8D8C-4A34F1345E84}.png)
+![{ADF92BAE-1744-4BCE-8D8C-4A34F1345E84}](./D:/algorithm/assets/{ADF92BAE-1744-4BCE-8D8C-4A34F1345E84}.png)
 
 
 
