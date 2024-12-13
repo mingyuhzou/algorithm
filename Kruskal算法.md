@@ -2,9 +2,9 @@
 
 # Kruskal算法
 
-最小生成树（Minimum Spanning Tree，MST）是一个在连接所有图的顶点的同时具有最小总权重的树形子图。在一个连通的带权无向图中，生成树是原图的一个子图，它包含了图中的所有顶点，并且是一棵树，没有包含任何环路。树与图的区别是树没有环。
+该算法用于**重构**一棵树，从而生成**最小生成树**（Minimum Spanning Tree，MST）是一个在连接所有图的顶点的同时具有最小总权重的树形子图。在一个连通的带权无向图中，生成树是原图的一个子图，它包含了图中的所有顶点，并且是一棵树，没有包含任何环路。树与图的区别是树没有环。
 
-首先对所有的边排序然后从最小的边开始遍历，如果二者不连通则连接上同时累加权重，**最后判断是否连通分量等于1（即n个点n-1条边）**
+基本思想是**贪心+并查集**，首先对所有的边按**权重**排序然后从最小的边开始遍历，如果二者不连通则连接上同时累加权重，**最后判断是否连通分量等于1（即n个点n-1条边）**
 
 最小生成树算法可以用于求最短路
 
@@ -294,4 +294,88 @@ class Solution:
 ```
 
 
+
+## **Sum of Max Matching**
+
+![{EB06C172-2781-43BB-A439-EB5E2AEC295D}](./assets/{EB06C172-2781-43BB-A439-EB5E2AEC295D}.png)
+
+题目保证AB中的元素无交集
+
+
+
+最小化最大的边权想到最小生成树
+
+这里使用两个数组start和end记录A和B中数出现的次数，在使用克鲁斯科尔的过程中，当一条边可以连接两个集合中的数时，这条边的权值就是两个集合中点相互到达的路径上的最小的最大值，因为从小到大枚举边。注意这里可能会连接集合内部的点而不是两个集合之间，因此最后需要修改start和end
+
+```python
+class UF:
+    def __init__(self, n):
+        self.count = n
+        self.parent = [i for i in range(n)]
+        self.size = [1 for _ in range(n)]
+
+    def union(self, p, q):
+        rootp = self.find(p)
+        rootq = self.find(q)
+        if rootq == rootp:
+            return
+        self.parent[p]=q
+        self.count -= 1
+
+    def connect(self, p, q):
+        rootp = self.find(p)
+        rootq = self.find(q)
+        return rootq == rootp
+
+    def find(self,p):
+        if self.parent[p]!=p:
+            self.parent[p]=self.find(self.parent[p])
+        return self.parent[p]
+
+n,m,k=RR()
+edges=[]
+# 记录以这个点为根有多少个待匹配的点
+start=[0]*n
+end=[0]*n
+for _ in range(m):
+    edges.append(RR())
+# 初始化
+for x in RR():start[x-1]+=1
+for x in RR():end[x-1]+=1
+
+uf=UF(n)
+# 排序
+edges.sort(key=lambda x:x[-1])
+ans=0
+
+for a,b,w in edges:
+    a-=1
+    b-=1
+    # 找到端点对应的集合
+    fa,fb=uf.find(a),uf.find(b)
+    # 已经连接，跳过
+    if fa==fb:continue
+    # 连接，这里是将fa连到fa上，因为如果端点是在集合内，则默认以b为根，find不会改变被连接者的根
+    uf.union(fa,fb)
+    # a在start中,b在end中，取最小
+    mn=min(start[fa],end[fb])
+    ans+=mn*w
+    # 已经匹配了不再需要，减去
+    start[fa]-=mn
+    end[fb]-=mn
+
+    # 也可能是b在start中,a在end中
+    mn=min(start[fb],end[fa])
+    ans+=mn*w
+    start[fb]-=mn
+    end[fa]-=mn
+
+    # 在内部，将a端点连接到b
+    start[fb]+=start[fa]
+    start[fa]=0
+
+    end[fb]+=end[fa]
+    end[fa]=0
+print(ans)
+```
 
