@@ -4,59 +4,6 @@ BFS是把一些问题抽象成图，从一个点开始向四周扩散。一般�
 
 
 
-## 二叉树的最小深度
-
-<img src="./assets/image-20230915170301484.png" alt="image-20230915170301484" style="zoom:50%;" />
-
-```python
-class Solution(object):
-
-    def minDepth(self, root):
-
-        if not root:
-            return 0
-
-        q=deque()
-        q.append(root)
-        depth=1
-        while q:# 一层层往下走
-            sz=len(q)
-            for i in range(sz): # 遍历每一层的节点
-                curr=q.popleft()# 弹出
-                
-                if curr.left==None and curr.right==None:# 满足是叶子节点
-                    return depth
-                # 扩散
-                if curr.left:
-                    q.append(curr.left)
-                if curr.right:
-                    q.append(curr.right)
-            
-            depth+=1# 一层判断完了，再加一
-        return depth
-
-#可以使用DFS算法解出，但是时间复杂度会更高因为需要遍历每一个路径，而BFS借助队列做到齐头并进，可以在不完整遍历的情况下找到最短距离，但是BFS 的空间复杂度较高     
-class Solution(object):
-
-    def minDepth(self, root):
-        if not root:
-            return 0
-        self.res=[]
-        depth=1
-        self.backtrace(root,depth)
-        return min(self.res)
-        
-    def backtrace(self,root,depth):
-        
-        if root.left==None and root.right==None:
-            self.res.append(depth)
-            return 
-        if root.left:
-            self.backtrace(root.left,depth+1)
-        if root.right:
-            self.backtrace(root.right,depth+1)
-```
-
 # 树的直径
 
 ## 树的直径
@@ -752,7 +699,7 @@ class Solution:
         return []
 ```
 
-### [颜色交替的最短路径](https://leetcode.cn/problems/shortest-path-with-alternating-colors/)
+## [颜色交替的最短路径](https://leetcode.cn/problems/shortest-path-with-alternating-colors/)
 
 ![image-20240313105753082](./assets/image-20240313105753082.png)
 
@@ -1020,7 +967,7 @@ class Solution:
 
 这道题用bfs存在回头的走法为了保证计数器的大小模p-1可以为0，同时对于同一个位置虽然他可以多次访问但是条件是再次访问这个位置时计数器的大小模p-1不会重复，如果重复了那么相当于多走了无用的步数不符合题目要求。
 
-b数组没有作用，因为$p^{2^b}$取模p-1等于1（拆开看，每个p模p-1都为1，那么都累成上还是1）
+b数组没有作用，因为$p^{2^b}$取模p-1等于1（拆开看，每个p模p-1都为1，那么都累乘上还是1）
 
 ```python
 from collections import deque, defaultdict, Counter
@@ -1174,11 +1121,11 @@ print(-1)
 
 ## [找出最安全路径](https://leetcode.cn/problems/find-the-safest-path-in-a-grid/)
 
-![{ADF92BAE-1744-4BCE-8D8C-4A34F1345E84}](./D:/algorithm/assets/{ADF92BAE-1744-4BCE-8D8C-4A34F1345E84}.png)
+![{AB40D839-1B3E-4B23-8152-3978E4578678}](./assets/{AB40D839-1B3E-4B23-8152-3978E4578678}.png)
 
 
 
-二分找到最大的安全系数，二分的check函数中从起点出发到终点的路径上所有单元格到小偷的最小距离都要大于等于这个没觉得安全系数，为了得到每个格子到小偷的最小安全系数，使用多源BFS从有小偷的单元格出发往外遍历，得到每个单元格距离小偷的最小距离。
+二分找到最大的安全系数，二分的check函数中从起点出发到终点的路径上所有单元格到小偷的最小距离都要大于等于安全系数，为了得到每个格子到小偷的最小安全系数，使用多源BFS从有小偷的单元格出发往外遍历，得到每个单元格距离小偷的最小距离。
 
 ```python
 class Solution:
@@ -1234,13 +1181,42 @@ class Solution:
 
 
 
+# 0-1BFS
+
+边权为1或者0，可以使用0-1BFS，本质上是对Dijstra的优化，**因为边权只有0和1所以将最小堆换位双向队列，遇到0边权就插入到开头(因为一定是最小的)，1边权就插入到队尾。**
 
 
 
+## [到达角落需要移除障碍物的最小数目](https://leetcode.cn/problems/minimum-obstacle-removal-to-reach-corner/)
+
+![{1BB03996-90AE-4F43-99C7-11A7F285E354}](./assets/{1BB03996-90AE-4F43-99C7-11A7F285E354}.png)
 
 
 
-
+```python
+class Solution:
+    def minimumObstacles(self, g: List[List[int]]) -> int:
+        m,n=len(g),len(g[0])
+        dis=[[inf]*n for _ in range(m)]
+        d=deque()
+        dis[0][0]=0
+        d.append((0,0))
+        
+        while d:
+            i,j=d.popleft()
+            for dx,dy in (1,0),(0,1),(-1,0),(0,-1):
+                # Dijstra算法的判断逻辑
+                if 0<=(x:=dx+i)<m and 0<=(y:=dy+j)<n and g[x][y]+dis[i][j]<dis[x][y]:
+                    dis[x][y]=g[x][y]+dis[i][j]
+                    # 插入到队首还是队尾取决于边权
+                    if g[x][y]==0:
+                        d.appendleft((x,y))
+                    else:    
+                        d.append((x,y))
+                    
+        return dis[-1][-1]
+ 
+```
 
 
 
