@@ -2,23 +2,7 @@
 
 # Dijkstra算法
 
-用于计算有权图中最短路径的算法，如果求解最小值要求`边权不能是负的`，但是求解最大值可以将边权变为负的从而求解最小值。时间复杂度为O(n^2)
 
-最终要得到如下的表：
-
-<img src="./assets/image-20231111121604341-1733840243523-425-1734403865239-1.png" alt="image-20231111121604341" style="zoom:50%;" />
-
-第一列表示当前的节点，第二列表示从起始节点到目标节点的之间的最短路径是多少，第三列是到在起始节点到当前节点路径上当前节点的前一个节点。
-
-初始时，将所有的距离设置为无穷大，而起始节点对应的距离设置为0，表示自己到自己的距离为0，所有的前序节点设置为0.
-
-<img src="./assets/image-20231111122134915-1733840243523-424-1734403865239-2.png" alt="image-20231111122134915" style="zoom:67%;" />
-
-朴素的做法是，每一次找到当前没有被访问过的距离起点最近的点（贪心），把这个点当作中间节点(mid)，更新与他相连的点(curr)距离起点(start)的距离，这个距离是（start到mid的距离加上mid到curr，start到curr距离）的最小值。
-
-算法中使用优先级队列（以距离作为优先级），每轮循环弹出优先级最大的（距离最小的），然后找这个节点的邻居，从起始节点的距离到邻居的距离等于从起始节点到弹出节点的距离加上弹出节点到邻居的距离，如果这个值小于邻居原本的距离则更新，并将邻居加入到优先级队列中（如果起始节点到这个节点的距离变化了，所有经过这个节点的路径也都会变化，所以加入到队列中稍后进行处理）。一直循环直到队列空了。
-
-使用堆优化的版本时间复杂度为O(mlogn),其中m表示边的数目适用于稀疏图。
 
 
 
@@ -290,33 +274,6 @@ class Solution:
         return f[-1]
 ```
 
-## [穿越网格图的安全路径](https://leetcode.cn/problems/find-a-safe-walk-through-a-grid/)
-
-![image-20240918090422027](./assets/image-20240918090422027-1733840243523-439-1734403865240-10.png)
-
-二维网格图可以使用Dijkstra算法求解最短路
-
-```python
-class Solution:
-    def findSafeWalk(self, grid: List[List[int]], health: int) -> bool:
-        m,n=len(grid),len(grid[0])
-        # 距离数组要变为二维的
-        dis=[[inf]*n for _ in range(m)]
-        dis[0][0]=grid[0][0]
-        h=[(dis[0][0],0,0)]
-        while h:
-            d,i,j=heappop(h)
-            if d>dis[i][j]:continue
-            # 这里无需建图，直接往四个方向走
-            for x,y in (i-1,j),(i+1,j),(i,j-1),(i,j+1):
-                if 0<=x<m and 0<=y<n:
-                    c=grid[x][y]
-                    if dis[i][j]+c<dis[x][y]:
-                        dis[x][y]=dis[i][j]+c
-                        heappush(h,(dis[x][y],x,y))
-        return dis[-1][-1]<health
-```
-
 
 
 ## [使网格图至少有一条有效路径的最小代价](https://leetcode.cn/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/)
@@ -389,15 +346,39 @@ class Solution:
 
 
 
+## [最大汉明距离](https://leetcode.cn/problems/maximum-hamming-distances/)
 
+![{DD6022A1-C831-425D-9DC6-A5B1C8304EBC}](./assets/{DD6022A1-C831-425D-9DC6-A5B1C8304EBC}.png)
 
+![{F3F06B06-4ACC-400A-A393-177ADDD4DCC8}](./assets/{F3F06B06-4ACC-400A-A393-177ADDD4DCC8}.png)
 
+以二进制的角度看，每走一步就是反转一位 ，题目中要求的汉明距离最大即对应的不同二进制位越多越好，如果使用Dijkstra直接求解的会为了得到最大距离而走环(不断反转同一位)，这里将二进制转化为反码那么最大汉明距离就变为对应的相同二进制位越少越好
 
+**题目中求解所有值的汉明距离，通过将所有的点作为起点做Dijkstra可以找到每一个点与其他点的最小距离。**最后的结果是dis[x]即x到所有起点的最小距离，也就是和反码相同位的有多少个，用m减去即可得到原码所需操作的次数
 
-
-
-
-
+```python
+class Solution:
+    def maxHammingDistances(self, nums: List[int], m: int) -> List[int]:
+        dis=defaultdict(lambda:inf)
+        h=[]
+        mask=(1<<m)-1
+        for v in nums:
+            # 转换为反码
+            dis[v^mask]=0
+            heappush(h,(0,v^mask))
+        
+        while h:
+            d,x=heappop(h)
+            # 当前点之前出过堆
+            if d>dis[x]:continue
+            for j in range(m):
+                # 反转每一位
+                state=x^(1<<j)
+                if  d+1<dis[state]:
+                    dis[state]=d+1
+                    heappush(h,(dis[state],state))
+        return [m-dis[v] for v in nums]
+```
 
 
 
