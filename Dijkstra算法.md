@@ -380,11 +380,84 @@ class Solution:
         return [m-dis[v] for v in nums]
 ```
 
+## [到达目的地的第二短时间](https://leetcode.cn/problems/second-minimum-time-to-reach-destination/)
+
+<img src="./assets/{685E7412-9D1C-448E-8784-FCB8440B2E54}.png" alt="{685E7412-9D1C-448E-8784-FCB8440B2E54}" style="zoom:80%;" />
+
+要得到第二大的距离只需在距离数组中额外维护一个变量即可，每次更新时先于最小的比较在于第二小的比较。
 
 
 
+```python
+class Solution:
+    def secondMinimum(self, n: int, edges, time: int, change: int) -> int:
+        dis=[[inf,inf] for _ in range(n)]
+        dis[0][0]=0
+        g=[[] for _ in range(n)]
+        for u,v in edges:
+            u-=1
+            v-=1
+            g[v].append(u)
+            g[u].append(v)
+        h=[(0,0)]
+        while h:
+            d,x=heappop(h)
+            if d>dis[x][1]:continue
+            for nx in g[x]:
+                t=time+d
+                if (d//change)&1:
+                    t+=change-d%change
+                if dis[nx][0]>t:
+                    dis[nx][0],dis[nx][1]=t,dis[nx][0]
+                    heappush(h,(dis[nx][0],nx))
+                    heappush(h,(dis[nx][1],nx))
+                elif t!=dis[nx][0] and dis[nx][1]>t:
+                    dis[nx][1]=t
+                    heappush(h,(dis[nx][1],nx))
+        return dis[-1][-1]
+res=Solution().secondMinimum(7,[[1,2],[1,3],[2,5],[2,6],[6,5],[5,7],[3,4],[4,7]],4,7)
+print(res)
+```
 
 
+
+## [细分图中的可到达节点](https://leetcode.cn/problems/reachable-nodes-in-subdivided-graph/)
+
+![{20F6C2FB-1001-4213-AFE7-B7797A6194D5}](./assets/{20F6C2FB-1001-4213-AFE7-B7797A6194D5}.png)
+
+使用BFS模拟会难以判断是否要访问已经过的节点，这里转换为单源最短路问题，这里的边权是w+1，对于每个点做出从起点出发能到达的最短距离，首先枚举每个点如果能到达就把这个点入计入，随后枚举每条边，如果到达边的两个端点后还能继续走那么即计入答案。
+
+```python
+class Solution:
+    def reachableNodes(self, edges: List[List[int]], cnt: int, n: int) -> int:
+        ans=0
+        g=defaultdict(dict)
+        # 建图，注意边权加一
+        for u,v,w in edges:
+            g[u][v]=g[v][u]=w+1
+        h=[(0,0)]
+        dis=[inf]*n
+        dis[0]=0
+        # 求最短路
+        while h:
+            d,x=heappop(h)
+            if d>dis[x]:continue
+            for k,v in g[x].items():
+                if dis[k]>d+v:
+                    dis[k]=d+v
+                    heappush(h,(dis[k],k))
+        # 先枚举节点
+        for i in range(n):
+            if dis[i]<=cnt:ans+=1
+        # 找边
+        for u,v,w in edges:
+            # 注意不要计算负数
+            a=max(0,cnt-dis[u])
+            b=max(0,cnt-dis[v])
+            ans+=min(a+b,w)
+            
+        return ans
+```
 
 
 
