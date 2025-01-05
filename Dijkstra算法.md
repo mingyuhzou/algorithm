@@ -461,3 +461,80 @@ class Solution:
 
 
 
+## [得到要求路径的最小带权子图](https://leetcode.cn/problems/minimum-weighted-subgraph-with-the-required-paths/)
+
+![{70320F47-4ED1-4FE2-B5E8-04E20437526E}](./assets/{70320F47-4ED1-4FE2-B5E8-04E20437526E}-1736042731058-2.png)
+
+直接求解距离会导致重复计算某段距离，**这里枚举三个点的交汇点**，首先预处理出src1,src2到其他点的距离，再通过反边找到dest到其他点的距离，如下所示的图中通过枚举交汇点可以避免重复计算，如果三个点是在链上则会枚举到三个点的中间节点得到正确答案。
+
+![111.png](./assets/1647142194-ulupZX-111.png)
+
+```python
+class Solution:
+    def minimumWeight(self, n: int, edges: List[List[int]], src1: int, src2: int, dest: int) -> int:
+        g=defaultdict(dict)
+        reg=defaultdict(dict)
+        for u,v,w in edges:
+            if u in reg[v]:reg[v][u]=min(reg[v][u],w)
+            else:reg[v][u]=w
+            if v in g[u]:g[u][v]=min(g[u][v],w)
+            else:g[u][v]=w
+
+        def dijkstra(g,start):
+            dis=[inf]*n
+            dis[start]=0
+            h=[(0,start)]
+            while h:
+                d,x=heappop(h)
+                if d>dis[x]:continue
+                for k,v in g[x].items():
+                    if dis[k]>d+v:
+                        dis[k]=d+v
+                        heappush(h,(dis[k],k))
+            return dis
+        d1,d2,d3=dijkstra(g,src1),dijkstra(g,src2),dijkstra(reg,dest)
+        ans=min(sum(d) for d in zip(d1,d2,d3))
+        if ans==inf:return -1
+        return ans
+```
+
+## [规定时间内到达终点的最小花费](https://leetcode.cn/problems/minimum-cost-to-reach-destination-in-time/)
+
+![{21B02BC1-7069-4B80-8A01-4DCA59A7D44E}](./assets/{21B02BC1-7069-4B80-8A01-4DCA59A7D44E}.png)
+
+本题有两个约束条件一个是费用一个是时间，这里以费用作为权重，以时间作为更新依据，因为即使费用更低但却有可能超时而不满足条件，所以把满足不超时的路径也加入到堆中
+
+```python
+class Solution:
+    def minCost(self, maxTime: int, edges: List[List[int]], f: List[int]) -> int:
+        n=len(f)
+        g=[[] for _ in range(n)]
+        # 建图，点之间会有多条边
+        for u,v,w in edges:
+            g[u].append((v,w))
+            g[v].append((u,w))
+        # 费用为权重
+        h=[(f[0],0,0)]
+        # 使用时间做判断依据
+        time=[inf]*n
+        time[0]=0
+        while h:
+            d,t,x=heappop(h)
+            # 找到了直接返回
+            if x==n-1:return d
+            for k,v in g[x]:
+                '''
+                不超时且到达下一个点的时间要更小，如果时间大于则下一节点被访问过了
+                因为根堆每次弹出最小的值，所以先访问到的节点费用一定更少，此时
+                下一节点需要的时间又更短，那么就完全没有更新的必要
+
+                '''
+                if t+v>=time[k] or t+v>maxTime:continue
+                '''对于一个节点只有访问到它的距离更短(tieme[i]=inf)
+                或者访问到的它的时间更短(time[i]>t+v)时才会更新
+                '''
+                time[k]=t+v
+                heappush(h,(f[k]+d,t+v,k))
+        return -1
+```
+
