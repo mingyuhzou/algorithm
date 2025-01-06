@@ -502,7 +502,7 @@ class Solution:
 
 ![{21B02BC1-7069-4B80-8A01-4DCA59A7D44E}](./assets/{21B02BC1-7069-4B80-8A01-4DCA59A7D44E}.png)
 
-本题有两个约束条件一个是费用一个是时间，这里以费用作为权重，以时间作为更新依据，因为即使费用更低但却有可能超时而不满足条件，所以把满足不超时的路径也加入到堆中
+本题有两个约束条件一个是费用一个是时间，从起点出发第一次到达的点的费用一定是最低的，**因为本题中权重是在点上的而非边上。相当于固定了一个变量去找另一个变量，即已经确定一个先走过的位置费用一定更小，如果时间不会更小的话那么一定是无用的状态。**为了固定费用根堆以费用最为权重。
 
 ```python
 class Solution:
@@ -536,5 +536,159 @@ class Solution:
                 time[k]=t+v
                 heappush(h,(f[k]+d,t+v,k))
         return -1
+```
+
+
+
+[K 站中转内最便宜的航班](https://leetcode.cn/problems/cheapest-flights-within-k-stops/)
+
+![{4028C489-5EFF-42EB-A8F5-F418ECCE5FEB}](./assets/{4028C489-5EFF-42EB-A8F5-F418ECCE5FEB}.png)
+
+本题是边权，对于约束条件经过的点数，已经访问过的位置一定是更小的，因此如果费用不会更小的话那么一定是无用的状态。
+
+为了固定访问次数，根堆以访问次数作为权重
+
+```python
+class Solution:
+    def findCheapestPrice(self, n: int, edges: List[List[int]], src: int, dst: int, kk: int) -> int:
+        dis=[inf]*n
+        dis[src]=0
+        ans=inf
+        g=defaultdict(dict)
+        # 建图
+        for u,v,w in edges:
+            g[u][v]=w
+        h=[(0,0,src)]
+        while h:
+            cnt,d,x=heappop(h)
+            if x==dst:ans=min(ans,d)
+            for k,v in g[x].items():
+                # 次数不能超过
+                if cnt>kk:continue
+                # 只有费用更小才有可能
+                if d+v<dis[k]:
+                    dis[k]=d+v
+                    heappush(h,(cnt+1,dis[k],k))
+        if ans!=inf:return ans
+        return -1
+```
+
+或者也可以扩展状态，用类似DP的方式求解
+
+```python
+class Solution:
+    def findCheapestPrice(self, n: int, edges: List[List[int]], src: int, dst: int, kk: int) -> int:
+        dis=[[inf]*(kk+2) for _ in range(n)]
+        dis[src][0]=0
+        g=defaultdict(dict)
+        # 建图
+        for u,v,w in edges:
+            g[u][v]=w
+        h=[(0,0,src)]
+        while h:
+            d,cnt,x=heappop(h)
+            for k,v in g[x].items():
+                if cnt+1>kk+1:continue
+                if d+v<dis[k][cnt+1]:
+                    dis[k][cnt+1]=d+v
+                    heappush(h,(dis[k][cnt+1],cnt+1,k))
+        if (ans:=min(dis[dst]))!=inf:return ans
+        return -1
+```
+
+
+
+
+
+## [电动车游城市](https://leetcode.cn/problems/DFPeFJ/)
+
+![{C43654BB-0070-43BA-9CA5-C48737548B27}](./assets/{C43654BB-0070-43BA-9CA5-C48737548B27}.png)
+
+
+
+在传统最短路径问题的基础上，引入电量状态，**即dis[i]\[j]表示到达城市i时所剩电量为j所需的最短时间**。
+
+```python
+class Solution:
+    def electricCarPlan(self, edges: List[List[int]], cnt: int, start: int, end: int, charge: List[int]) -> int:
+        g=defaultdict(dict)
+        n=len(charge)
+        for u,v,w in edges:
+            if v in g[u]:g[u][v]=min(g[u][v],w)
+            else:g[u][v]=w
+
+            if u in g[v]:g[v][u]=min(g[v][u],w)
+            else:g[v][u]=w
+
+        h=[(0,0,start)]
+        dis=[[inf]*(cnt+1) for _ in range(n)]
+        dis[start][0]=0 
+        while h:
+            d,c,x=heappop(h)
+            if d>dis[x][c]:continue
+            if c+1<=cnt and dis[x][c+1]>d+charge[x]:
+                dis[x][c+1]=d+charge[x]
+                heappush(h,(dis[x][c+1],c+1,x))
+            for k,v in g[x].items():
+                if c<v:continue
+                if dis[k][c-v]>d+v:
+                    dis[k][c-v]=d+v
+                    heappush(h,(dis[k][c-v],c-v,k))
+
+        return min(dis[end])
+```
+
+
+
+## [隐藏网格下的最小消耗路径](https://leetcode.cn/problems/minimum-path-cost-in-a-hidden-grid/)
+
+![{10308EC8-AAEE-4339-A4E7-178F7D2A83F2}](./assets/{10308EC8-AAEE-4339-A4E7-178F7D2A83F2}-1736141235884-4.png)
+
+需要手动建图，这里无法找出起始点以及图的大小，因为当遇到被占用的位置以及超出边界时都会返回-1，因此无法判断到底能不能走，这里建图选择用偏移量作为点，即(0,0)表示起点，(0,-1)表示起点左移一位
+
+```python
+class Solution(object):
+    def findShortestPath(self, master: 'GridMaster') -> int:
+        dirs={'U':(-1,0),'D':(1,0),'L':(0,-1),'R':(0,1)}
+        reg={'U':'D','D':'U','L':'R','R':'L'}
+        
+        tx=ty=None
+
+        vis={}
+        # vis记录图
+        vis[(0,0)]=0
+        dest=None
+        def dfs(i,j):
+            nonlocal tx,ty
+
+            if master.isTarget():
+                tx,ty=i,j             
+            for dir in dirs:
+                dx,dy=dirs[dir]
+                # 如果位置记录过了就不再访问，相当于dfs遍历了一遍图
+                if master.canMove(dir) and (i+dx,j+dy) not in vis:
+                    vis[(i+dx,j+dy)]=master.move(dir)
+                    dfs(i+dx,j+dy)
+                    master.move(reg[dir])
+        dfs(0,0)
+
+        # 无法到达终点
+        if tx==None:return -1
+        # 用坐标点做Dijkstra
+        dis=defaultdict(lambda:inf)
+        # 跑Dijstra
+        dis[(0,0)]=0
+        h=[(0,0,0)]
+        while h:
+            d,i,j=heappop(h)
+            if i==tx and j==ty:return d
+            if d>dis[(i,j)]:continue
+            for dx,dy in dirs.values():
+                x=dx+i
+                y=dy+j
+                # 在vis中的才是图的节点
+                if (x,y) in vis and vis[(x,y)]+d<dis[(x,y)]:
+                    dis[(x,y)]=vis[(x,y)]+d
+                    heappush(h,(dis[(x,y)],x,y))
 ```
 
