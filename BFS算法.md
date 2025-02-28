@@ -238,19 +238,6 @@ class Solution:
 相当于用bfs求解最短路，将一个状态出发能得到的可能都枚举出来（过程中用集合去重）一步步往后找最终状态。
 
 ```python
-from collections import deque, defaultdict, Counter
-from functools import lru_cache
-from bisect import bisect_left
-from itertools import accumulate
-from math import ceil, inf
-import sys
-from typing import List
-#input = sys.stdin.readline
-def R(): return int(input())
-def RR(): return [int(x) for x in input().split()]
-def get_pre(nums):return list(accumulate(nums,initial=0))
-
-from collections import Counter
 n=int(input())
 a=list(input())+['1','1']
 b=list(input())+['1','1']
@@ -284,11 +271,56 @@ print(-1)
 
 
 
+## [Palindromic Shortest Path](https://atcoder.jp/contests/abc394/tasks/abc394_e)
+
+![image-20250228095017769](./assets/image-20250228095017769.png)
+
+问题要找任意两个点之间的最短路径，要求路径是一个回文串。使用Dijkstra求解在判断回文串时会很麻烦，这里借助回文串的性质使用bfs，入队相同位置(i,i)偶数长度，以及相连的不同位置(i,j)奇数长度，向外扩展走相同的字符。
+
+```python
+n=R()
+edges=defaultdict(lambda :defaultdict(list))
+rev=defaultdict(lambda :defaultdict(list))
+
+g=[]
+for i in range(n):
+    g.append(RS())
+    for j,c in enumerate(g[-1]):
+        if c!='-':
+            edges[i][c].append(j)
+            rev[j][c].append(i)
+dis=[[-1]*n for _ in range(n)]
+
+d=deque()
+
+# 入队
+for i in range(n):
+    d.append((i,i))
+    dis[i][i]=0
+
+for i in range(n):
+    for j in range(n):
+        if i!=j and g[i][j]!='-':
+            d.append((i,j))
+            dis[i][j]=1
 
 
+while d:
+    for _ in range(len(d)):
+        i,j=d.popleft()
+        # 枚举其他位置比判断枚举字符要方便
+        for a in range(n):
+            # 要相连
+            if g[a][i]=='-':continue
+            for b in range(n):
+                # 走相同的字符且取最小值
+                if g[j][b]==g[a][i] and dis[a][b]==-1:
+                    dis[a][b]=dis[i][j]+2
+                    d.append((a,b))
 
-
-
+for i in range(n):
+    print(*dis[i])          
+```
 
 
 
