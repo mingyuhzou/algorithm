@@ -322,15 +322,93 @@ for i in range(n):
     print(*dis[i])          
 ```
 
+## [ Min of Restricted Sum](https://atcoder.jp/contests/abc396/tasks/abc396_e)
+
+![image-20250313100608212](./assets/image-20250313100608212.png)
+
+题意：我们验证是否存在一个“好”序列，满足给定整数N、M及三个长度为M的序列：X、Y、Z。检查是否能构造一个满足对每个i，A$[X_i]$和A$[Y_i]$的XOR值等于$Z_i$的序列。
+
+<img src="./assets/image-20250313100617332.png" alt="image-20250313100617332" style="zoom:67%;" />
 
 
 
+所有的关系抽象到图上求解，对于XOR运算，得到连通块中的一个点权就可以**推出其他点的点权**。首先考虑无解的情况，假设端点的点权为0，在图上做**bfs**求解其他点的点权同时计算连通块每一位上1的个数，当同一个点**第二次**被访问时，如果**点权与第一次不同**，那么说明表达式矛盾。
+
+连通块的和可以看作是每一位上1的个数*$2^j$ ，为了得到最小的序列，根据XOR运算的性质，在每一位上可以进行**01反转**，因此如果连通块上的**1多于0**的个数，那么可以将端点的这一位**设置为1**(初始时模拟的是0)，**减少1的个数**。
+
+```python
+n,m=RR()
+edges=defaultdict(dict)
+# 建图
+for _ in range(m):
+    l,r,w=RR()
+    l-=1
+    r-=1 
+    edges[l][r]=w
+    edges[r][l]=w
+
+vis=[False]*n
+
+# 记录每个连通块每一位上1的个数
+cnt={}
+
+# 记录连通块的大小
+size=defaultdict(int)
+
+# 记录值
+val=[0]*n
+
+# bfs判断是否无解
+for i in range(n):
+    if not vis[i]:
+        d=deque([(i,0)])    
+        vis[i]=True
+        c=[0]*32 
+        while d:
+            for _ in range(len(d)):
+                size[i]+=1
+                x,pre=d.popleft()
+                # 求解每一位上1的个数之和
+                for j in range(32):
+                    if pre>>j&1:c[j]+=1
+                for nx,w in edges[x].items():
+                    # 第二次访问且值不同，则矛盾
+                    if vis[nx] and val[nx]!=pre^w:
+                        print(-1)
+                        exit(0)
+                    # 继续
+                    elif not vis[nx]:
+                        vis[nx]=True 
+                        val[nx]=w^pre
+                        d.append((nx,val[nx]))
+        cnt[i]=c
 
 
+vis=[False]*n
+val=[-1]*n
+# 求解点权
+for i in cnt:
+    x=0
+    s=size[i]
+    # 01反抓使得结果最小
+    for j in range(32):
+        if cnt[i][j]>s-cnt[i][j]:
+            x|=(1<<j)
+    # 做bfs求解最终结果
+    d=deque([(i,x)])   
+    val[i]=x  
+    vis[i]=True
+    while d:
+        for _ in range(len(d)):
+            x,pre=d.popleft()
+            for nx,w in edges[x].items():
+                if not vis[nx]:
+                    vis[nx]=True 
+                    val[nx]=w^pre
+                    d.append((nx,val[nx]))
 
-
-
-
+print(*val) 
+```
 
 
 
