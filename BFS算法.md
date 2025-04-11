@@ -551,5 +551,52 @@ class Solution:
 
 
 
+## [Ringo's Favorite Numbers 3](https://atcoder.jp/contests/abc400/tasks/abc400_e)
+
+![image-20250411225034509](./assets/image-20250411225034509.png)
+
+<img src="./assets/image-20250411225043078.png" alt="image-20250411225043078" style="zoom:67%;" />
+
+1e6大小的网格图，使用Dijkstra会超时，但是本题中边权为0或1，那么使用遇到边权为0，就添加到队首，反之添加到队尾
+
+每次遍历直接弹出队首，队首保证是最小值。
+
+```python
+m,n=RR()
+g=[]
+dis=[inf]*(n*m)
+for _ in range(m):
+    g.append(RS())
+
+pos=RR()
+ex,ey=pos[2]-1,pos[-1]-1
+
+d=deque([(0,pos[0]-1,pos[1]-1)])
+
+dis[(pos[0]-1)*n+pos[1]-1]=0
+
+while d:
+    c,i,j=d.popleft()
+    if i==ex and j==ey:
+        print(dis[ex*n+ey])
+        exit(0)
+    if c>dis[i*n+j]:continue
+    for dx,dy in (1,0),(0,1),(-1,0),(0,-1):
+        x,y=i+dx,j+dy
+        if x<0 or x>=m or y<0 or y>=n:continue
+        if g[x][y]=='.' and c<dis[x*n+y]:
+            dis[x*n+y]=c
+            d.appendleft((c,x,y))    
+        if c+1<dis[x*n+y] and g[x][y]=='#':
+            dis[x*n+y]=c+1
+            d.append((c+1,x,y))
+
+        if 0<=x+dx<m and g[x][y]=='#'and  0<=y+dy<n and c+1<dis[(x+dx)*n+y+dy]:
+            dis[(x+dx)*n+y+dy]=c+1
+            d.append((c+1,x+dx,y+dy))
+```
+
+
+
 
 
