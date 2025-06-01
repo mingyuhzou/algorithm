@@ -330,8 +330,6 @@ for i in range(n):
 
 <img src="./assets/image-20250313100617332.png" alt="image-20250313100617332" style="zoom:67%;" />
 
-
-
 所有的关系抽象到图上求解，对于XOR运算，得到连通块中的一个点权就可以**推出其他点的点权**。首先考虑无解的情况，假设端点的点权为0，在图上做**bfs**求解其他点的点权同时计算连通块每一位上1的个数，当同一个点**第二次**被访问时，如果**点权与第一次不同**，那么说明表达式矛盾。
 
 连通块的和可以看作是每一位上1的个数*$2^j$ ，为了得到最小的序列，根据XOR运算的性质，在每一位上可以进行**01反转**，因此如果连通块上的**1多于0**的个数，那么可以将端点的这一位**设置为1**(初始时模拟的是0)，**减少1的个数**。
@@ -414,13 +412,53 @@ print(*val)
 
 
 
+## [清理教室的最少移动](https://leetcode.cn/problems/minimum-moves-to-clean-the-classroom/)
 
+![image-20250601125259115](./assets/image-20250601125259115.png)
 
+<img src="./assets/image-20250601125305323.png" alt="image-20250601125305323" style="zoom:50%;" />
 
+是否要恢复，实现恢复还是先走到目标位置，难以考虑清楚。但是对于给定的数据范围完全可以做到定义dis[x]\[y][energy]\[m]然后做Dijkstra中的松弛操作即可。
 
-
-
-
+```python
+class Solution:
+    def minMoves(self, g: List[str], e: int) -> int:
+        m,n=len(g),len(g[0])
+        L={}
+        idx=0
+        for i in range(m):
+            for j in range(n):
+                if g[i][j]=='L':
+                    L[(i,j)]=idx
+                    idx+=1
+                elif g[i][j]=='S':
+                    sx,sy=i,j
+        
+        dis=[[[[inf]*(1<<len(L)) for _ in range(1+e)] for _ in range(n)] for _ in range(m)]
+        if not L:return 0
+        DIRS=(1,0),(0,1),(-1,0),(0,-1)
+        d=deque()
+        d.append((sx,sy,e,0))
+        dis[sx][sy][e][0]=0
+        sz=0
+        while d:
+            sz+=1
+            for _ in range(len(d)):
+                i,j,en,s=d.popleft()
+                if s==(1<<len(L))-1:
+                    return dis[i][j][en][s]
+                if g[i][j]=='R':en=e
+                if not en:continue
+                for dx,dy in DIRS:
+                    if 0<=(x:=dx+i)<m and 0<=(y:=dy+j)<n and g[x][y]!='X':
+                        mask=s
+                        if g[x][y]=='L':
+                            mask|=(1<<L[(x,y)])
+                        if sz<dis[x][y][en-1][mask]:
+                            dis[x][y][en-1][mask]=sz
+                            d.append((x,y,en-1,mask))
+        return -1
+```
 
 
 
