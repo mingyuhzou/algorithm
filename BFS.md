@@ -410,6 +410,61 @@ print(*val)
 
 
 
+## [Hungry Takahashi](https://atcoder.jp/contests/abc415/tasks/abc415_e)
+
+<img src="C:\Users\ROG\AppData\Roaming\Typora\typora-user-images\image-20250724162744216.png" alt="image-20250724162744216" style="zoom:67%;" />
+
+<img src="C:\Users\ROG\AppData\Roaming\Typora\typora-user-images\image-20250724162749937.png" alt="image-20250724162749937" style="zoom:67%;" />
+
+本题使用bfs往外找，但是队列中不能维护已有的硬币数量，否则在bfs查找的过程中会因为集合去重导致硬币更多的状态被忽略，如果使用Dijkstra算法松弛操作——同一位置只有硬币数量较多时才会记录，对于给定的数据范围会超时(一个位置可能有很多状态)。这里也不能使用堆优化，因为本题并不是硬币数量越多越好，即使数量少，但只要能到终点位置即可。
+
+本题使用类似刷表法的bfs操作，保证一个位置只有一个状态。队列中只记录坐标，同时用一个二维数组记录到达每个位置的最大值，在计算下一个位置时，会从数组中取值计算并更新二维数组中的最大值。
+
+```python
+m,n=RR()
+g=[]
+tmp=[]
+for _ in range(m):
+    g.append(RR())
+    tmp.extend(g[-1])
+
+nums=RR()
+tmp.sort()
+l,r=0,sum(nums)+10
+def check(x):
+    d=deque([(0,0)])
+    dis=[[-1]*n for _ in range(m)]
+    dis[0][0]=x
+    while d:
+        i,j=d.popleft()
+        cur=dis[i][j]+g[i][j]
+        # 不满足要求
+        if cur<nums[i+j]:continue
+        cur-=nums[i+j]
+
+        for dx,dy in (1,0),(0,1):
+            # 不越界
+            if 0<=(x:=dx+i)<m and 0<=(y:=j+dy)<n:
+                # 只有当没访问过才会加到队列中
+                if dis[x][y]==-1:
+                    d.append((x,y))
+                # 更新到这个地方的最大值
+                dis[x][y]=max(dis[x][y],cur)
+    if dis[-1][-1]<0:return False
+    return dis[-1][-1]+g[-1][-1]>=nums[-1]
+
+# 二分
+while l<=r:
+    mid=(l+r)>>1
+    if check(mid):
+        r=mid-1
+    else:
+        l=mid+1
+print(r+1)
+```
+
+
+
 
 
 ## [清理教室的最少移动](https://leetcode.cn/problems/minimum-moves-to-clean-the-classroom/)
